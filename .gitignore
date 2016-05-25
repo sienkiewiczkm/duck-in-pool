@@ -1,0 +1,5 @@
+*.pyc
+*.swp
+.DS_store
+.ycm_extra_conf.py
+build

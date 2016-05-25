@@ -1,0 +1,17 @@
+      Kaczka (2016)
+
+  Problem: Procedural texture samples only black after manual data upload.
+ Solution: GL_TEXTURE_MIN_FILTER and GL_TEXTURE_MAX_FILTER must be set. 
+
+  Problem: After binding GL_TEXTURE_2D and GL_TEXTURE_CUBE_MAP shader doesn't
+           work as expected. Water surface is dissapearing.
+ Solution: Both of the textures were bound to GL_TEXTURE0 slot. It is required
+           to manually select active slot using glActiveTexture and assign them
+           to separate texture slots.
+
+  Problem: BSpline derivative is calculated incorrectly. Near the end it loses
+           accuracy or validity.
+ Solution: Misinterpreted BSpline as BSpline with clamped knot vector.
+
+
+
