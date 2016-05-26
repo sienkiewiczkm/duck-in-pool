@@ -1,7 +1,6 @@
 #include "mesh.hpp"
 #include <fstream>
 #include <iostream>
-#include <vector>
 
 using namespace std;
 
@@ -23,7 +22,7 @@ void Mesh::load(const string &filename) {
   file.open(filename);
 
   file >> _numVertices;
-  vector<Vertex> vertices(_numVertices);
+  vector<VertexNormalTangentTex> vertices(_numVertices);
 
   for (auto i = 0; i < _numVertices; ++i) {
     file >> vertices[i].position.x 
@@ -35,6 +34,8 @@ void Mesh::load(const string &filename) {
       >> vertices[i].texCoord.x
       >> vertices[i].texCoord.y;
   }
+
+  calculateTangentVector(vertices);
 
   file >> _numTriangles;
   _numIndices = _numTriangles * 3;
@@ -50,7 +51,8 @@ void Mesh::load(const string &filename) {
 
   glBindVertexArray(_vao);
   glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex),
+  glBufferData(GL_ARRAY_BUFFER, 
+      vertices.size() * sizeof(VertexNormalTangentTex),
       &vertices[0], GL_STATIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
@@ -60,13 +62,20 @@ void Mesh::load(const string &filename) {
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
   glEnableVertexAttribArray(2);
+  glEnableVertexAttribArray(3);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 
-      (GLvoid*)offsetof(Vertex, position));
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 
-      (GLvoid*)offsetof(Vertex, normal));
-  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-      (GLvoid*)offsetof(Vertex, texCoord));
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 
+      sizeof(VertexNormalTangentTex), 
+      (GLvoid*)offsetof(VertexNormalTangentTex, position));
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 
+      sizeof(VertexNormalTangentTex), 
+      (GLvoid*)offsetof(VertexNormalTangentTex, normal));
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 
+      sizeof(VertexNormalTangentTex),
+      (GLvoid*)offsetof(VertexNormalTangentTex, tangent));
+  glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 
+      sizeof(VertexNormalTangentTex),
+      (GLvoid*)offsetof(VertexNormalTangentTex, texCoord));
 
   glBindVertexArray(0);
 }
@@ -81,3 +90,24 @@ void Mesh::draw() {
   glBindVertexArray(0);
 }
 
+void Mesh::calculateTangentVector(
+    std::vector<VertexNormalTangentTex> &vertices
+) {
+  glm::vec3 tangentPlaneNormal(0.0f, 1.0f, 0.0f);
+  glm::vec3 idealTangentVector(1.0f, 0.0f, 0.0f);
+  for (auto i = 0; i < vertices.size(); ++i) {
+    glm::vec3 tangent;
+    const auto &normal = vertices[i].normal;
+    float cosa = glm::dot(tangentPlaneNormal, normal);
+    if (fabs(cosa) > 0.95f) {
+      tangent = idealTangentVector;
+    } else {
+      tangent = glm::cross(normal, tangentPlaneNormal);
+    }
+    
+    vertices[i].tangent = tangent;
+
+    cerr << "calculated tangent for " << i << " is (" << tangent.x << " ; "
+      << tangent.y << " ; " << tangent.z << ")" << endl;
+  }
+}

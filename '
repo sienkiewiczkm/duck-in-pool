@@ -1,0 +1,21 @@
+#version 330 core
+
+in vec3 outColor;
+in vec2 outTexCoord;
+out vec4 color;
+
+uniform sampler2D textureSampler;
+uniform mat4 viewProj;
+
+in VS_OUT {
+  vec3 normal;
+  vec3 tangent;
+  vec2 texCoord;
+} fsIn;
+
+void main()
+{
+  vec3 tangent = normalize(fsIn.tangent);
+  color = vec4(fsIn.tangent.xxx*2+1, 1);
+//  color = texture(textureSampler, fsIn.texCoord);
+} 

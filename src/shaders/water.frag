@@ -40,18 +40,17 @@ void main()
   vec2 positionOnCubePlane = (2.0 * psTexCoord) - 1.0;
   vec3 positionInCube = vec3(positionOnCubePlane.x, 0, positionOnCubePlane.y);
 
-  float exposure = 0.34;
   vec3 waterReflectionVec = reflect(-cameraVec, waterNormal);
   vec3 fixedWaterReflectionVec = cubemapCoordFromAnyPoint(positionInCube,
       waterReflectionVec);
-  vec3 cubemapReflectionColor = exposure * texture(cubemapSampler,
+  vec3 cubemapReflectionColor = texture(cubemapSampler,
       fixedWaterReflectionVec).rgb;
 
   float refractionRatio = 1.0 / 1.33;
   vec3 waterRefractionVec = refract(-cameraVec, waterNormal, refractionRatio);
   vec3 fixedWaterRefractionVec = cubemapCoordFromAnyPoint(positionInCube,
       waterRefractionVec);
-  vec3 cubemapRefractionColor = exposure * texture(cubemapSampler, 
+  vec3 cubemapRefractionColor = texture(cubemapSampler, 
       fixedWaterRefractionVec).rgb;
 
   float fresnelFactor = schlick(abs(cameraVec.y));

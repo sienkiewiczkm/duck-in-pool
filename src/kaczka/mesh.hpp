@@ -4,10 +4,18 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <string>
+#include <vector>
 
 struct Vertex {
   glm::vec3 position;
   glm::vec3 normal;
+  glm::vec2 texCoord;
+};
+
+struct VertexNormalTangentTex {
+  glm::vec3 position;
+  glm::vec3 normal;
+  glm::vec3 tangent;
   glm::vec2 texCoord;
 };
 
@@ -26,6 +34,11 @@ public:
   inline int getNumVertices() { return _numVertices; }
   inline int getNumIndices() { return _numIndices; }
   inline int getNumTriangles() { return _numTriangles; }
+
+protected:
+  void calculateTangentVector(
+      std::vector<VertexNormalTangentTex> &vertices
+  );
 
 private:  
   int _numVertices, _numTriangles, _numIndices;

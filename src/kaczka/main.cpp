@@ -51,8 +51,8 @@ int main()
   glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);  
   glViewport(0, 0, framebufferWidth, framebufferHeight);
 
-  VertexShader vertexShader(SHADER_PATH_PREFIX"triangle.vert");
-  FragmentShader fragmentShader(SHADER_PATH_PREFIX"triangle.frag");
+  VertexShader vertexShader(SHADER_PATH_PREFIX"duck.vert");
+  FragmentShader fragmentShader(SHADER_PATH_PREFIX"duck.frag");
   ShaderProgram program;
   program.attach(&vertexShader);
   program.attach(&fragmentShader);
@@ -105,11 +105,12 @@ int main()
 
   BSpline2D spline;
   vector<glm::vec2> controlPoints;
-  // todo: Random this points.
-  controlPoints.push_back(glm::vec2(0.0f, 5.0f));
-  controlPoints.push_back(glm::vec2(5.0f, 0.0f));
-  controlPoints.push_back(glm::vec2(0.0f, -5.0f));
-  controlPoints.push_back(glm::vec2(-5.0f, 0.0f));
+  const int cDuckControlPoints = 10;
+  for (auto i = 0; i < cDuckControlPoints; ++i) {
+    float x = randomReal(generator) * 5.0f;
+    float y = randomReal(generator) * 5.0f;
+    controlPoints.push_back(glm::vec2(x, y));
+  }
   spline.setLoopedControlPoints(controlPoints);
 
   camera.rotate(glm::radians(30.0f), glm::radians(45.0f));
@@ -121,7 +122,7 @@ int main()
       previousTime = currentTime;
       currentTime = glfwGetTime();
       double deltaTime = currentTime - previousTime;
-      duckParameter += deltaTime / 10.0f;
+      duckParameter += deltaTime / 30.0f;
       duckParameter -= (int)(duckParameter);
 
       if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
@@ -188,6 +189,18 @@ int main()
       glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(viewProj));
       glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE,
           glm::value_ptr(modelMatrix));
+
+      glUniform3fv(
+          glGetUniformLocation(program.getId(), "cameraPosition"),
+          1, 
+          glm::value_ptr(camera.getPosition())
+      );
+
+      glUniform3fv(
+          glGetUniformLocation(program.getId(), "lightPosition"),
+          1,
+          glm::value_ptr(glm::vec3(0.0f, 0.0f, 0.0f))
+      );
 
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, woodTexture);
