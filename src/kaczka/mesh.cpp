@@ -106,8 +106,5 @@ void Mesh::calculateTangentVector(
     }
     
     vertices[i].tangent = tangent;
-
-    cerr << "calculated tangent for " << i << " is (" << tangent.x << " ; "
-      << tangent.y << " ; " << tangent.z << ")" << endl;
   }
 }

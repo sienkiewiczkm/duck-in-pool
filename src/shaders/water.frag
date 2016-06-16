@@ -33,7 +33,7 @@ void main()
   vec3 diffuseColor = diffuse * lightColor;
 
   vec3 reflectVec = reflect(-lightVec, waterNormal);
-  float specularStrength = 0.2f;
+  float specularStrength = 0.4f;
   float specular = pow(max(dot(cameraVec, reflectVec), 0.0), 32);
   vec3 specularColor = specularStrength * specular * lightColor;
 
